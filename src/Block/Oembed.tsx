@@ -86,7 +86,7 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
   ) : block.url ? (
     <>{block.url}</>
   ) : (
-    <span style={{ color: "gray" }}>
+    <span className="mt-be-placeholder">
       {t("Please input URL to be resolved by oEmbed API")}
     </span>
   );
