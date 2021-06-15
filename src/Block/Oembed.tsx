@@ -83,12 +83,8 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
       block={block}
       html={block.compiledHtml}
     />
-  ) : block.url ? (
-    <>{block.url}</>
   ) : (
-    <span className="mt-be-placeholder">
-      {t("Please input URL to be resolved by oEmbed API")}
-    </span>
+    <>{block.url}</>
   );
 };
 
@@ -123,8 +119,14 @@ class Oembed extends Block {
     if (focus || focusBlock) {
       this.reset();
       return <Editor key={this.id} block={this} />;
-    } else {
+    } else if (this.url) {
       return this.html();
+    } else {
+      return (
+        <span className="mt-be-placeholder">
+          {t("Please input URL to be resolved by oEmbed API")}
+        </span>
+      );
     }
   }
 
