@@ -51,15 +51,19 @@ const Editor: React.FC<EditorProps> = blockProperty(
       <BlockLabel block={block}>
         <label className="mt-be-label-name">
           <div>{t("URL")}</div>
-          <input type="url" name="url" data-mt-block-editor-focus-default />
+          <input
+            type="url"
+            data-property-name="url"
+            data-mt-block-editor-focus-default
+          />
         </label>
         <label className="mt-be-label-name">
           <div>{t("Max Width (optional)")}</div>
-          <input type="number" name="maxwidth" />
+          <input type="number" data-property-name="maxwidth" />
         </label>
         <label className="mt-be-label-name">
           <div>{t("Max Height (optional)")}</div>
-          <input type="number" name="maxheight" />
+          <input type="number" data-property-name="maxheight" />
         </label>
       </BlockLabel>
     </div>
