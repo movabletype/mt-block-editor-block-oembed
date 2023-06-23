@@ -1,3 +1,5 @@
+let resolveCount = 0;
+
 export function type(...args) {
   cy.get("body").type(...args);
 }
@@ -42,7 +44,7 @@ export function apply(opts) {
                   };
                 } else if (/www\.sixapart\.com/.test(url)) {
                   return {
-                    html: '<a href="https://www.sixapart.com/">sixapart</a>',
+                    html: `<a href="https://www.sixapart.com/">sixapart</a><span>resolved: ${resolveCount++}</span>`,
                     ogUrl: "https://www.sixapart.com/",
                     ogTitle: "sixapart",
                     ogImage: "https://www.sixapart.com/sixapart.png",
