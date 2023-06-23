@@ -25,18 +25,7 @@ interface HtmlProps {
   block: Oembed;
 }
 
-interface OembedData {
-  version: string;
-  type: string;
-  width: number;
-  height: number;
-  title: string;
-  html: string;
-  author_name: string;
-  author_url: string;
-  provider_name: string;
-  provider_url: string;
-}
+type OembedData = Record<string, string>;
 
 type Resolver = (params: {
   url: string;
@@ -102,21 +91,38 @@ class Oembed extends Block {
   }
 
   public url = "";
-  public width: number | null = null;
-  public height: number | null = null;
   public maxwidth: number | null = null;
   public maxheight: number | null = null;
-  public providerName: string | null = null;
+  public resolvedData: OembedData | null = null;
 
   public constructor(init?: Partial<Oembed>) {
     super();
     if (init) {
-      Object.assign(this, init);
+      const initData = { ...init };
+      const parentKeys = Reflect.ownKeys(new Block());
+      const ownKeys = Reflect.ownKeys(this).filter(
+        (k) => typeof k == "string" && !parentKeys.includes(k)
+      ) as (keyof Oembed)[];
+      for (const k of ownKeys) {
+        if (k in initData) {
+          (this as Record<string, any>)[k] = initData[k];
+          delete initData[k];
+        }
+      }
+      if (Object.keys(initData).length > 0) {
+        this.resolvedData = initData as OembedData;
+      }
     }
   }
 
   public metadata(): Metadata | null {
-    return this.metadataByOwnKeys();
+    const meta = this.metadataByOwnKeys();
+    if (meta?.resolvedData) {
+      const d = meta.resolvedData;
+      delete meta.resolvedData;
+      Object.assign(meta, d);
+    }
+    return meta;
   }
 
   public editor({ focus, focusBlock }: EditorOptions): JSX.Element {
@@ -165,9 +171,14 @@ class Oembed extends Block {
       }
 
       this.compiledHtml = res.html;
-      this.width = res.width;
-      this.height = res.height;
-      this.providerName = res.provider_name;
+      this.resolvedData = {};
+      for (const k in res) {
+        if (k === "html") {
+          continue;
+        }
+        const jsonKey = k.replace(/_(.)/g, (_, c) => c.toUpperCase());
+        this.resolvedData[jsonKey] = res[k];
+      }
     } catch (e) {
       this.reset();
       this.compiledHtml = t(
@@ -187,9 +198,7 @@ class Oembed extends Block {
 
   private reset(): void {
     this.compiledHtml = "";
-    this.width = null;
-    this.height = null;
-    this.providerName = null;
+    this.resolvedData = null;
   }
 }
 
