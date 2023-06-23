@@ -40,7 +40,7 @@
     "i18next-parser": "^1.0.6",
     "jest": "^26.6.3",
     "mini-css-extract-plugin": "^0.8.2",
-    "mt-block-editor-block": "^1.1.9",
+    "mt-block-editor-block": "^1.1.14",
     "postcss-flexbugs-fixes": "^4.2.1",
     "postcss-import": "^12.0.1",
     "postcss-loader": "^3.0.0",

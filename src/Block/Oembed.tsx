@@ -1,5 +1,9 @@
 import { t } from "../i18n";
-import React, { useState, useEffect } from "mt-block-editor-block/React";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+} from "mt-block-editor-block/React";
 import { blockProperty } from "mt-block-editor-block/decorator";
 import {
   BlockIframePreview,
@@ -34,29 +38,43 @@ type Resolver = (params: {
 }) => Promise<OembedData>;
 
 const Editor: React.FC<EditorProps> = blockProperty(
-  ({ block }: EditorProps) => (
-    <div className={css.Oembed}>
-      <BlockSetupCommon block={block} keys={["label", "helpText"]} />
-      <BlockLabel block={block}>
-        <label className="mt-be-label-name">
-          <div>{t("URL")}</div>
-          <input
-            type="url"
-            data-property-name="url"
-            data-mt-block-editor-focus-default
-          />
-        </label>
-        <label className="mt-be-label-name">
-          <div>{t("Max Width (optional)")}</div>
-          <input type="number" data-property-name="maxwidth" />
-        </label>
-        <label className="mt-be-label-name">
-          <div>{t("Max Height (optional)")}</div>
-          <input type="number" data-property-name="maxheight" />
-        </label>
-      </BlockLabel>
-    </div>
-  )
+  ({ block }: EditorProps) => {
+    const { editor } = useEditorContext();
+
+    const reset = useCallback(() => {
+      block.reset();
+    }, []);
+    useEffect(() => {
+      editor.on("change", reset);
+      return () => {
+        editor.off("change", reset);
+      };
+    });
+
+    return (
+      <div className={css.Oembed}>
+        <BlockSetupCommon block={block} keys={["label", "helpText"]} />
+        <BlockLabel block={block}>
+          <label className="mt-be-label-name">
+            <div>{t("URL")}</div>
+            <input
+              type="url"
+              data-property-name="url"
+              data-mt-block-editor-focus-default
+            />
+          </label>
+          <label className="mt-be-label-name">
+            <div>{t("Max Width (optional)")}</div>
+            <input type="number" data-property-name="maxwidth" />
+          </label>
+          <label className="mt-be-label-name">
+            <div>{t("Max Height (optional)")}</div>
+            <input type="number" data-property-name="maxheight" />
+          </label>
+        </BlockLabel>
+      </div>
+    );
+  }
 );
 
 const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
@@ -65,6 +83,10 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
 
   useEffect(() => {
     (async () => {
+      if (block.compiledHtml) {
+        return;
+      }
+
       await block.compile({ editor });
       setCompiledHtml(block.compiledHtml);
     })();
@@ -99,9 +121,8 @@ class Oembed extends Block {
     super();
     if (init) {
       const initData = { ...init };
-      const parentKeys = Reflect.ownKeys(new Block());
       const ownKeys = Reflect.ownKeys(this).filter(
-        (k) => typeof k == "string" && !parentKeys.includes(k)
+        (k) => typeof k === "string"
       ) as (keyof Oembed)[];
       for (const k of ownKeys) {
         if (k in initData) {
@@ -127,7 +148,6 @@ class Oembed extends Block {
 
   public editor({ focus, focusBlock }: EditorOptions): JSX.Element {
     if (focus || focusBlock) {
-      this.reset();
       return <Editor key={this.id} block={this} />;
     } else if (this.url) {
       return this.html();
@@ -191,12 +211,13 @@ class Oembed extends Block {
   }
 
   public static async newFromHtml({
+    html,
     meta,
   }: NewFromHtmlOptions): Promise<Oembed> {
-    return new Oembed(meta);
+    return new Oembed({ compiledHtml: html, ...meta });
   }
 
-  private reset(): void {
+  public reset(): void {
     this.compiledHtml = "";
     this.resolvedData = null;
   }
