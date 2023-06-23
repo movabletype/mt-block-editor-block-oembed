@@ -51,15 +51,19 @@ const Editor: React.FC<EditorProps> = blockProperty(
       <BlockLabel block={block}>
         <label className="mt-be-label-name">
           <div>{t("URL")}</div>
-          <input type="url" name="url" data-mt-block-editor-focus-default />
+          <input
+            type="url"
+            data-property-name="url"
+            data-mt-block-editor-focus-default
+          />
         </label>
         <label className="mt-be-label-name">
           <div>{t("Max Width (optional)")}</div>
-          <input type="number" name="maxwidth" />
+          <input type="number" data-property-name="maxwidth" />
         </label>
         <label className="mt-be-label-name">
           <div>{t("Max Height (optional)")}</div>
-          <input type="number" name="maxheight" />
+          <input type="number" data-property-name="maxheight" />
         </label>
       </BlockLabel>
     </div>
@@ -83,12 +87,8 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
       block={block}
       html={block.compiledHtml}
     />
-  ) : block.url ? (
-    <>{block.url}</>
   ) : (
-    <span className="mt-be-placeholder">
-      {t("Please input URL to be resolved by oEmbed API")}
-    </span>
+    <>{block.url}</>
   );
 };
 
@@ -123,8 +123,14 @@ class Oembed extends Block {
     if (focus || focusBlock) {
       this.reset();
       return <Editor key={this.id} block={this} />;
-    } else {
+    } else if (this.url) {
       return this.html();
+    } else {
+      return (
+        <span className="mt-be-placeholder">
+          {t("Please input URL to be resolved by oEmbed API")}
+        </span>
+      );
     }
   }
 
