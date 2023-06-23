@@ -20,7 +20,7 @@ export function apply(opts) {
           shortcutBlockTypes: ["sixapart-oembed"],
           block: {
             "sixapart-oembed": {
-              resolver: async ({url, maxWidth, maxHeight}) => {
+              resolver: async ({ url, maxWidth, maxHeight }) => {
                 if (/youtube/.test(url)) {
                   return {
                     height: 270,
@@ -39,6 +39,13 @@ export function apply(opts) {
                       "https://i.ytimg.com/vi/h9yxBcbw0bw/hqdefault.jpg",
                     type: "video",
                     thumbnail_height: 360,
+                  };
+                } else if (/www\.sixapart\.com/.test(url)) {
+                  return {
+                    html: '<a href="https://www.sixapart.com/">sixapart</a>',
+                    ogUrl: "https://www.sixapart.com/",
+                    ogTitle: "sixapart",
+                    ogImage: "https://www.sixapart.com/sixapart.png",
                   };
                 } else {
                   throw "error";
