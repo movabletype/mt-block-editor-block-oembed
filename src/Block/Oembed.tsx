@@ -83,7 +83,7 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
 
   useEffect(() => {
     (async () => {
-      if (block.compiledHtml) {
+      if (block.compiledHtml !== undefined) {
         return;
       }
 
@@ -92,7 +92,7 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
     })();
   });
 
-  return block.compiledHtml ? (
+  return block.compiledHtml !== undefined ? (
     <BlockIframePreview
       key={block.id}
       block={block}
@@ -218,7 +218,7 @@ class Oembed extends Block {
   }
 
   public reset(): void {
-    this.compiledHtml = "";
+    this.compiledHtml = undefined;
     this.resolvedData = null;
   }
 }
