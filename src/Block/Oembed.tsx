@@ -81,7 +81,7 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
     })();
   });
 
-  return block.compiledHtml ? (
+  return block.compiledHtml !== undefined ? (
     <BlockIframePreview
       key={block.id}
       block={block}
@@ -186,7 +186,7 @@ class Oembed extends Block {
   }
 
   private reset(): void {
-    this.compiledHtml = "";
+    this.compiledHtml = undefined;
     this.width = null;
     this.height = null;
     this.providerName = null;
