@@ -170,10 +170,12 @@ class Oembed extends Block {
       this.providerName = res.provider_name;
     } catch (e) {
       this.reset();
+      const error = e instanceof Error ? e.message : t("Error occurred");
       this.compiledHtml = t(
-        "Could not retrieve HTML for embedding from {{URL}}",
+        "Could not retrieve HTML for embedding from {{URL}}: {{error}}",
         {
           URL: this.url,
+          error,
         }
       );
     }
