@@ -92,6 +92,7 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
   );
 };
 
+const compilePromiseSymbol = Symbol("compilePromise");
 class Oembed extends Block {
   public static typeId = "sixapart-oembed";
   public static selectable = true;
@@ -107,6 +108,7 @@ class Oembed extends Block {
   public maxwidth: number | null = null;
   public maxheight: number | null = null;
   public providerName: string | null = null;
+  private [compilePromiseSymbol]: Promise<OembedData> | null = null;
 
   public constructor(init?: Partial<Oembed>) {
     super();
@@ -154,11 +156,16 @@ class Oembed extends Block {
     }
     const resolver = opts.resolver as Resolver;
     try {
-      const res = await resolver({
+      const currentCompilePromise = (this[compilePromiseSymbol] = resolver({
         url: this.url,
         maxwidth: this.maxwidth || null,
         maxheight: this.maxheight || null,
-      });
+      }));
+
+      const res = await currentCompilePromise;
+      if (this[compilePromiseSymbol] !== currentCompilePromise) {
+        return;
+      }
 
       if (!res.html) {
         throw res;
@@ -192,6 +199,7 @@ class Oembed extends Block {
     this.width = null;
     this.height = null;
     this.providerName = null;
+    this[compilePromiseSymbol] = null;
   }
 }
 
