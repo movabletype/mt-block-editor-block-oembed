@@ -3,6 +3,6 @@
   "Please input URL to be resolved by oEmbed API": "URLを入力してください",
   "Max Width (optional)": "最大幅（任意）",
   "Max Height (optional)": "最大高さ（任意）",
-  "Could not retrieve HTML for embedding from {{URL}}: {{error}}": "{{URL}}の埋め込み用のHTMLを取得することができませんでした: {{error}}",
+  "Could not retrieve HTML for embedding from {{URL}}: {{error}}": "{{URL}}の埋め込みHTMLを取得できませんでした: {{error}}",
   "Error occurred": "エラーが発生しました"
 }
