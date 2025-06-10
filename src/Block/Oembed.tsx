@@ -38,11 +38,12 @@ interface OembedData {
   provider_url: string;
 }
 
-type Resolver = (params: {
+type ResolverParams = {
   url: string;
   maxwidth: number | null;
   maxheight: number | null;
-}) => Promise<OembedData>;
+};
+type Resolver = (params: ResolverParams) => Promise<OembedData>;
 
 const Editor: React.FC<EditorProps> = blockProperty(
   ({ block }: EditorProps) => (
@@ -92,7 +93,7 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
   );
 };
 
-const compilePromiseSymbol = Symbol("compilePromise");
+const compileWorker = Symbol("compileWorker");
 class Oembed extends Block {
   public static typeId = "sixapart-oembed";
   public static selectable = true;
@@ -108,7 +109,10 @@ class Oembed extends Block {
   public maxwidth: number | null = null;
   public maxheight: number | null = null;
   public providerName: string | null = null;
-  private [compilePromiseSymbol]: Promise<OembedData> | null = null;
+  private [compileWorker]: {
+    params: Parameters<Resolver>[0];
+    promise: Promise<OembedData>;
+  } | null = null;
 
   public constructor(init?: Partial<Oembed>) {
     super();
@@ -156,14 +160,24 @@ class Oembed extends Block {
     }
     const resolver = opts.resolver as Resolver;
     try {
-      const currentCompilePromise = (this[compilePromiseSymbol] = resolver({
+      const params: ResolverParams = {
         url: this.url,
         maxwidth: this.maxwidth || null,
         maxheight: this.maxheight || null,
-      }));
+      };
+      const currentCompileWorker =
+        this[compileWorker] &&
+        (Object.keys(params) as (keyof ResolverParams)[]).every(
+          (key) => params[key] === this[compileWorker]?.params[key]
+        )
+          ? this[compileWorker] // reuse if last params are the same
+          : (this[compileWorker] = {
+              params,
+              promise: resolver(params),
+            });
 
-      const res = await currentCompilePromise;
-      if (this[compilePromiseSymbol] !== currentCompilePromise) {
+      const res = await currentCompileWorker.promise;
+      if (this[compileWorker]?.promise !== currentCompileWorker.promise) {
         return;
       }
 
@@ -199,7 +213,7 @@ class Oembed extends Block {
     this.width = null;
     this.height = null;
     this.providerName = null;
-    this[compilePromiseSymbol] = null;
+    this[compileWorker] = null;
   }
 }
 
