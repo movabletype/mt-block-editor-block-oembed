@@ -19,7 +19,7 @@ import Block, {
 import { useEditorContext } from "mt-block-editor-block/Context";
 
 import icon from "../img/icon/oembed.svg";
-import css from "../css/Oembed.scss";
+import css from "../css/Oembed.module.css";
 
 interface EditorProps {
   block: Oembed;
@@ -146,7 +146,7 @@ class Oembed extends Block {
     return meta;
   }
 
-  public editor({ focus, focusBlock }: EditorOptions): JSX.Element {
+  public editor({ focus, focusBlock }: EditorOptions): React.ReactElement {
     if (focus || focusBlock) {
       return <Editor key={this.id} block={this} />;
     } else if (this.url) {
@@ -160,7 +160,7 @@ class Oembed extends Block {
     }
   }
 
-  public html(): JSX.Element {
+  public html(): React.ReactElement {
     return <Html key={this.id} block={this} />;
   }
 
