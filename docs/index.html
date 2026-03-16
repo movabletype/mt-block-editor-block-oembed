@@ -36,12 +36,12 @@
     </div>
     <link
       rel="stylesheet"
-      href="https://cdn.movabletype.net/libs/mt-block-editor/1.1.14/mt-block-editor.css"
+      href="https://cdn.movabletype.net/libs/mt-block-editor/branch/retire-webpack/mt-block-editor.css"
     />
-    <script src="https://cdn.movabletype.net/libs/mt-block-editor/1.1.14/mt-block-editor.js"></script>
-    <script src="./dist/mt-block-editor-block-oembed.js"></script>
-    <script src="./register-block.js"></script>
-    <script>
+    <script src="https://cdn.movabletype.net/libs/mt-block-editor/branch/retire-webpack/mt-block-editor.js" type="module"></script>
+    <script src="./dist/mt-block-editor-block-oembed.js" type="module"></script>
+    <script src="./register-block.js" type="module"></script>
+    <script type="module">
       MTBlockEditor.apply({
         mode: sessionStorage.getItem("MTBlockEditorMode") || "composition",
         id: "body",

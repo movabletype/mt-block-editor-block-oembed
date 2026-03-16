@@ -38,7 +38,7 @@ export default defineConfig({
     modules: {},
   },
   server: {
-    open: "/index.html",
+    open: "docs/index.html",
   },
   esbuild: {
     jsx: "automatic",
