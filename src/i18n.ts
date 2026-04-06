@@ -10,7 +10,13 @@ i18n.on("initialized", () => {
     const match = path.match(/\.\/locales\/(\w+)\/translation\.json/);
     if (match) {
       const lang = match[1];
-      i18n.addResourceBundle(lang, "translation", translations[path], true, false);
+      i18n.addResourceBundle(
+        lang,
+        "translation",
+        translations[path],
+        true,
+        false
+      );
     }
   }
 });
