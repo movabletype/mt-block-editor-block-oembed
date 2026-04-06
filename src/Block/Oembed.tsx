@@ -15,7 +15,7 @@ import Block, {
 import { useEditorContext } from "mt-block-editor-block/Context";
 
 import icon from "../img/icon/oembed.svg";
-import css from "../css/Oembed.scss";
+import css from "../css/Oembed.module.css";
 
 interface EditorProps {
   block: Oembed;
@@ -38,11 +38,12 @@ interface OembedData {
   provider_url: string;
 }
 
-type Resolver = (params: {
+type ResolverParams = {
   url: string;
   maxwidth: number | null;
   maxheight: number | null;
-}) => Promise<OembedData>;
+};
+type Resolver = (params: ResolverParams) => Promise<OembedData>;
 
 const Editor: React.FC<EditorProps> = blockProperty(
   ({ block }: EditorProps) => (
@@ -81,7 +82,7 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
     })();
   });
 
-  return block.compiledHtml ? (
+  return block.compiledHtml !== undefined ? (
     <BlockIframePreview
       key={block.id}
       block={block}
@@ -92,6 +93,7 @@ const Html: React.FC<HtmlProps> = ({ block }: HtmlProps) => {
   );
 };
 
+const compileWorker = Symbol("compileWorker");
 class Oembed extends Block {
   public static typeId = "sixapart-oembed";
   public static selectable = true;
@@ -107,6 +109,10 @@ class Oembed extends Block {
   public maxwidth: number | null = null;
   public maxheight: number | null = null;
   public providerName: string | null = null;
+  private [compileWorker]: {
+    params: Parameters<Resolver>[0];
+    promise: Promise<OembedData>;
+  } | null = null;
 
   public constructor(init?: Partial<Oembed>) {
     super();
@@ -119,7 +125,7 @@ class Oembed extends Block {
     return this.metadataByOwnKeys();
   }
 
-  public editor({ focus, focusBlock }: EditorOptions): JSX.Element {
+  public editor({ focus, focusBlock }: EditorOptions): React.ReactElement {
     if (focus || focusBlock) {
       this.reset();
       return <Editor key={this.id} block={this} />;
@@ -134,7 +140,7 @@ class Oembed extends Block {
     }
   }
 
-  public html(): JSX.Element {
+  public html(): React.ReactElement {
     return <Html key={this.id} block={this} />;
   }
 
@@ -154,11 +160,26 @@ class Oembed extends Block {
     }
     const resolver = opts.resolver as Resolver;
     try {
-      const res = await resolver({
+      const params: ResolverParams = {
         url: this.url,
         maxwidth: this.maxwidth || null,
         maxheight: this.maxheight || null,
-      });
+      };
+      const currentCompileWorker =
+        this[compileWorker] &&
+        (Object.keys(params) as (keyof ResolverParams)[]).every(
+          (key) => params[key] === this[compileWorker]?.params[key]
+        )
+          ? this[compileWorker] // reuse if last params are the same
+          : (this[compileWorker] = {
+              params,
+              promise: resolver(params),
+            });
+
+      const res = await currentCompileWorker.promise;
+      if (this[compileWorker]?.promise !== currentCompileWorker.promise) {
+        return;
+      }
 
       if (!res.html) {
         throw res;
@@ -170,10 +191,12 @@ class Oembed extends Block {
       this.providerName = res.provider_name;
     } catch (e) {
       this.reset();
+      const error = e instanceof Error ? e.message : t("Error occurred");
       this.compiledHtml = t(
-        "Could not retrieve HTML for embedding from {{URL}}",
+        "Could not retrieve HTML for embedding from {{URL}}: {{error}}",
         {
           URL: this.url,
+          error,
         }
       );
     }
@@ -186,10 +209,11 @@ class Oembed extends Block {
   }
 
   private reset(): void {
-    this.compiledHtml = "";
+    this.compiledHtml = undefined;
     this.width = null;
     this.height = null;
     this.providerName = null;
+    this[compileWorker] = null;
   }
 }
 

@@ -20,13 +20,12 @@ export function apply(opts) {
           shortcutBlockTypes: ["sixapart-oembed"],
           block: {
             "sixapart-oembed": {
-              resolver: async ({url, maxWidth, maxHeight}) => {
+              resolver: async ({ url, maxWidth, maxHeight }) => {
                 if (/youtube/.test(url)) {
                   return {
                     height: 270,
                     provider_name: "YouTube",
-                    html:
-                      '<iframe width="480" height="270" src="https://www.youtube.com/embed/h9yxBcbw0bw?feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+                    html: '<iframe width="480" height="270" src="https://www.youtube.com/embed/h9yxBcbw0bw?feature=oembed" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
                     author_name: "ドクター・キャピタルDr. Capital",
                     title:
                       "スピッツ (Spitz) の チェリー (Cherry) - Dr. Capital",

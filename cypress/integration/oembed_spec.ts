@@ -13,7 +13,9 @@ context("Text", () => {
   });
 
   it("supported", () => {
-    cy.get(`.mt-be-shortcut-block-list [data-mt-be-type="sixapart-oembed"]`).click();
+    cy.get(
+      `.mt-be-shortcut-block-list [data-mt-be-type="sixapart-oembed"]`
+    ).click();
 
     cy.wait(100);
     type("https://www.youtube.com/watch?v=h9yxBcbw0bw\n");
@@ -25,7 +27,9 @@ context("Text", () => {
   });
 
   it("unsupported", () => {
-    cy.get(`.mt-be-shortcut-block-list [data-mt-be-type="sixapart-oembed"]`).click();
+    cy.get(
+      `.mt-be-shortcut-block-list [data-mt-be-type="sixapart-oembed"]`
+    ).click();
 
     cy.wait(100);
     type("https://www.example.com/watch?v=h9yxBcbw0bw\n");
