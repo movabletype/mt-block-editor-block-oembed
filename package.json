@@ -26,9 +26,9 @@
   },
   "author": "Taku Amano <tamano@sixapart.com>",
   "devDependencies": {
+    "@eslint/js": "^9.7.0",
     "@types/node": "^22.0.0",
     "@types/react": "^16.14.68",
-    "@eslint/js": "^9.7.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "cypress": "^14.5.1",
@@ -45,6 +45,7 @@
     "postcss-nested": "^7.0.2",
     "postcss-preset-env": "^10.2.4",
     "prettier": "^3.8.1",
+    "terser": "^5.46.1",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-svg-loader": "^5.1.0",
